@@ -55,8 +55,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--model_path', type=str, default=None,
                        help='评估模型路径，默认为None')
-    parser.add_argument('--num_episodes', type=int, default=10,
-                       help='评估次数，默认为10次')  # 添加新的参数
+    parser.add_argument('--num_episodes', type=int, default=1000,
+                       help='评估次数，默认为1000次')  # 添加新的参数
 
     args = parser.parse_args()
 
