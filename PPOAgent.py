@@ -6,18 +6,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PolicyNetwork import PolicyNetwork
 
+class PPOMemory:
+    def __init__(self, batch_size=32):
+        self.states = []
+        self.actions = []
+        self.rewards = []
+        self.next_states = []
+        self.dones = []
+        self.batch_size = batch_size
+        
+    def push(self, state, action, reward, next_state, done):
+        self.states.append(state)
+        self.actions.append(action)
+        self.rewards.append(reward)
+        self.next_states.append(next_state)
+        self.dones.append(done)
+        
+    def sample(self):
+        # 随机采样batch_size大小的经验
+        indices = np.random.choice(len(self.states), self.batch_size)
+        return (
+            torch.FloatTensor(np.array(self.states)[indices]),
+            torch.FloatTensor(np.array(self.actions)[indices]),
+            torch.FloatTensor(np.array(self.rewards)[indices]),
+            torch.FloatTensor(np.array(self.next_states)[indices]),
+            torch.FloatTensor(np.array(self.dones)[indices])
+        )
+
 class PPOAgent:
-    def __init__(self, env, device, lr=3e-4, gamma=0.99, k_epochs=4, eps_clip=0.2):
+    def __init__(self, env, device):
         """
         初始化 PPO 智能体
         
         参数:
             env: OpenAI Gym 环境
             device: 计算设备（CPU/GPU）
-            lr: 学习率
-            gamma: 折扣因子
-            k_epochs: PPO更新轮数
-            eps_clip: PPO裁剪参数
         """
         self.env = env
         self.device = device
@@ -25,10 +48,13 @@ class PPOAgent:
         self.action_dim = env.action_space.n
 
         self.policy = PolicyNetwork(self.state_dim, self.action_dim).to(self.device)
-        self.optimizer = optim.Adam(self.policy.parameters(), lr=lr)
-        self.gamma = gamma
-        self.k_epochs = k_epochs
-        self.eps_clip = eps_clip
+        self.optimizer = optim.Adam(self.policy.parameters(), lr=0.0001)
+        self.gamma = 0.99
+        self.gae_lambda = 0.95
+        self.actor_lr = 0.0001
+        self.critic_lr = 0.0001
+        self.eps_clip = 0.2
+        self.K_epochs = 10
         
         # 存储训练数据
         self.states = []
@@ -77,7 +103,7 @@ class PPOAgent:
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
 
         # PPO更新
-        for _ in range(self.k_epochs):
+        for _ in range(self.K_epochs):
             probs, state_values_new = self.policy(states)
             m = Categorical(probs)
             new_logprobs = m.log_prob(actions)
@@ -113,8 +139,14 @@ class PPOAgent:
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.show()
 
-    def train(self, max_episodes=3000):
+    def train(self, max_episodes):
+        print(f"开始训练 \t 训练轮数: {max_episodes}")
+
         """训练智能体"""
+        best_reward = 0
+        stable_count = 0
+        patience = 50  # 连续50轮都保持高分才保存模型
+        
         for episode in range(max_episodes):
             state, _ = self.env.reset()
             done = False
@@ -140,6 +172,20 @@ class PPOAgent:
             
             if (episode + 1) % 10 == 0:
                 print(f"回合 {episode + 1}\t总奖励: {total_reward}")
+
+            if total_reward >= 495:  # 接近最大奖励
+                stable_count += 1
+            else:
+                stable_count = 0
+            
+            if stable_count >= patience and total_reward > best_reward:
+                best_reward = total_reward
+                self.save_model(f"best_model_{best_reward:.0f}.pth")
+            
+            # 如果连续100轮都达到接近最大奖励，可以提前结束
+            if stable_count >= 100:
+                print(f"提前结束训练：已经连续{stable_count}轮达到高分")
+                break
 
     def evaluate(self, state):
         """评估状态"""
