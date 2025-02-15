@@ -103,15 +103,28 @@ class PPOAgent:
         self.dones = []
 
     def plot_rewards(self):
-        """绘制奖励趋势图"""
+        """绘制奖励趋势图并保存"""
+        # 设置中文字体
+        plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']  # Mac系统
+        # plt.rcParams['font.sans-serif'] = ['SimHei']  # Windows系统
+        plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+        
         data = np.array(self.episode_rewards)
         plt.figure(figsize=(12, 6))
         plt.plot(data, linewidth=1)
-        plt.title('奖励趋势')
-        plt.xlabel('回合数')
-        plt.ylabel('奖励值')
+        
+        # 使用英文标题避免字体问题
+        plt.title('Reward Trend')
+        plt.xlabel('Episodes')
+        plt.ylabel('Rewards')
         plt.grid(True, linestyle='--', alpha=0.7)
-        plt.show()
+        
+        # 生成时间戳文件名并保存图片
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"checkpoints/reward_trend_{timestamp}.jpg"
+        plt.savefig(filename)
+        plt.close()
 
     def train(self, max_episodes=3000):
         """训练智能体"""

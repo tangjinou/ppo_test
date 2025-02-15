@@ -3,7 +3,8 @@ import torch
 from PPOAgent import PPOAgent
 from gym.wrappers import RecordVideo
 import argparse
-import datetime  # 在文件开头添加此导入
+import datetime
+import os  # 添加os导入
 
 
 def train_with_no_ui(num_episodes=3000):
@@ -12,9 +13,12 @@ def train_with_no_ui(num_episodes=3000):
     print(f"使用设备: {device}")
     agent = PPOAgent(env, device)
     agent.train(num_episodes)
-    # 生成带时间戳的模型文件名
+    
+    # 确保checkpoints文件夹存在
+    os.makedirs('checkpoints', exist_ok=True)
+    # 生成带时间戳的模型文件名，并保存在checkpoints文件夹下
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    model_filename = f"ppo_model_{timestamp}.pth"
+    model_filename = os.path.join('checkpoints', f"ppo_model_{timestamp}.pth")
     agent.save_model(model_filename)
     env.close()
     agent.plot_rewards()
@@ -27,9 +31,12 @@ def train_with_ui(num_episodes=3000):
     
     agent = PPOAgent(env, device)
     agent.train(num_episodes)
-    # 生成带时间戳的模型文件名
+    
+    # 确保checkpoints文件夹存在
+    os.makedirs('checkpoints', exist_ok=True)
+    # 生成带时间戳的模型文件名，并保存在checkpoints文件夹下
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    model_filename = f"ppo_model_{timestamp}.pth"
+    model_filename = os.path.join('checkpoints', f"ppo_model_{timestamp}.pth")
     agent.save_model(model_filename)
     # 训练后进行展示
     print("\n开始展示训练结果...")
