@@ -1,4 +1,5 @@
 from PolicyNetwork import PolicyNetwork
+from PolicyNetworkWithTransformer import PolicyNetworkWithTransformer
 from typing import Optional
 
 class PolicyNetworkFactory:

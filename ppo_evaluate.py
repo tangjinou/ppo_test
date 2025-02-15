@@ -84,6 +84,7 @@ def evaluate_model(model_path,game_name="CartPole-v1", num_episodes=10):  # 增�
         play_game(game_name,model_path)
     else:
         print(f"模型 {model_name} 性能较差")
+        play_game(game_name,model_path)
 
 
 
@@ -151,6 +152,6 @@ if __name__ == "__main__":
         exit()
 
     print(f"游戏名称: {args.game_name}，评估次数: {args.num_episodes}，模型路径: {args.model_path}")
-    
+
     evaluate_model(model_path, game_name=args.game_name, num_episodes=args.num_episodes)  # 传入评估次数参数
 

@@ -7,11 +7,11 @@ import datetime
 import os  # 添加os导入
 
 
-def train_with_no_ui(num_episodes=3000, early_stop=False, game_name="CartPole-v1"):
+def train_with_no_ui(num_episodes=3000, network_type="simple", early_stop=False, game_name="CartPole-v1"):
     env = gym.make('CartPole-v1')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
-    agent = PPOAgent(env, device, early_stop=early_stop)
+    agent = PPOAgent(env, device, network_type=network_type, early_stop=early_stop)
     agent.train(num_episodes)
     
     # 确保checkpoints文件夹存在
@@ -23,13 +23,13 @@ def train_with_no_ui(num_episodes=3000, early_stop=False, game_name="CartPole-v1
     env.close()
     agent.plot_rewards()
 
-def train_with_ui(num_episodes=3000, early_stop=False, game_name="CartPole-v1"):
+def train_with_ui(num_episodes=3000, network_type="simple", early_stop=False, game_name="CartPole-v1"):
     # 创建环境并启用视频录制
     env = gym.make('CartPole-v1', render_mode="human")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
     
-    agent = PPOAgent(env, device, early_stop=early_stop)
+    agent = PPOAgent(env, device, network_type=network_type, early_stop=early_stop)
     agent.train(num_episodes)
     
     # 确保checkpoints文件夹存在
@@ -72,8 +72,12 @@ if __name__ == "__main__":
                        help='训练轮数，默认为10000')
     parser.add_argument('--game_name', type=str, default="CartPole-v1",
                        help='游戏名称，默认为CartPole-v1')
+    parser.add_argument('--network_type', type=str, default="simple",
+                       help='策略网络类型，默认为simple')
     parser.add_argument('--early_stop', type=bool, default=False,
                        help='是否提前停止训练，默认为False')
+    
+
     
     
     args = parser.parse_args()
@@ -81,12 +85,13 @@ if __name__ == "__main__":
     num_episodes = args.num_episodes
     early_stop = args.early_stop
     game_name = args.game_name
+    network_type = args.network_type
 
     
     if args.ui:
-        train_with_ui(num_episodes, early_stop, game_name)
+        train_with_ui(num_episodes, network_type,early_stop, game_name)
     else:
-        train_with_no_ui(num_episodes, early_stop, game_name)  
+        train_with_no_ui(num_episodes, network_type, early_stop, game_name)  
 
 
 

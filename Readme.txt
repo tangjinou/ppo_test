@@ -27,6 +27,8 @@ python ppo_evaluate.py --model_path  #评估模型路径，默认为运行时che
 
 ## CartPole-v0 环境说明
 
+介绍可以看这个 https://zhuanlan.zhihu.com/p/570695189
+
 ### 观察空间（Observation Space）
 四维连续空间:
 
