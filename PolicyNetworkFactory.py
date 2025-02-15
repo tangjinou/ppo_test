@@ -18,11 +18,16 @@ class PolicyNetworkFactory:
         返回:
             PolicyNetwork 实例
         """
+
+        print(f"创建策略网络: {network_type}") 
         if network_type == "simple":
-            return PolicyNetwork(state_dim, action_dim)
+            return PolicyNetworkWithTransformer(state_dim, action_dim)
         elif network_type == "medium":
             return PolicyNetwork(state_dim, action_dim, hidden_dim=256)
         elif network_type == "large":
             return PolicyNetwork(state_dim, action_dim, hidden_dim=512)
+        elif network_type == "transformer":
+            return PolicyNetworkWithTransformer(state_dim, action_dim)
         else:
             raise ValueError(f"未知的网络类型: {network_type}") 
+        

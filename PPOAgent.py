@@ -26,6 +26,8 @@ class PPOAgent:
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.n
 
+        print(f"PPOAgent init: network_type = {network_type}")
+
         # 使用工厂类创建策略网络
         self.policy = PolicyNetworkFactory.create_policy(
             network_type, 
@@ -53,6 +55,9 @@ class PPOAgent:
         self.early_stop_window = 20    # 计算平均奖励的窗口大小
         self.best_avg_reward = float('-inf')
         self.no_improve_count = 0
+
+        # 保存网络类型
+        self.network_type = network_type
 
     def select_action(self, state):
         """选择动作"""
@@ -137,7 +142,7 @@ class PPOAgent:
         plt.plot(data, linewidth=1)
         
         # 使用英文标题避免字体问题
-        plt.title('Reward Trend')
+        plt.title('Reward Trend with network type: ' + self.network_type)
         plt.xlabel('Episodes')
         plt.ylabel('Rewards')
         plt.grid(True, linestyle='--', alpha=0.7)
@@ -191,10 +196,28 @@ class PPOAgent:
         return probs, state_value
 
     def save_model(self, path):
-        """保存模型"""
-        torch.save(self.policy.state_dict(), path)
+        """保存模型和网络配置"""
+        model_info = {
+            'state_dict': self.policy.state_dict(),
+            'network_type': self.network_type,
+            'state_dim': self.state_dim,
+            'action_dim': self.action_dim
+        }
+        torch.save(model_info, path)
 
     def load_model(self, path):
-        """加载模型"""
-        self.policy.load_state_dict(torch.load(path))
-        self.policy.to(self.device) 
+        """加载模型和网络配置"""
+        print(f"加载模型: {path}")
+        model_info = torch.load(path)
+        # 使用保存的配置重新创建策略网络
+        self.policy = PolicyNetworkFactory.create_policy(
+            model_info['network_type'],
+            model_info['state_dim'],
+            model_info['action_dim']
+        ).to(self.device)
+        
+        # 加载模型参数
+        self.policy.load_state_dict(model_info['state_dict'])
+        self.policy.to(self.device)
+
+        return model_info 

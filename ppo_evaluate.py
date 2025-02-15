@@ -24,7 +24,7 @@ def evaluate_model(model_path,game_name="CartPole-v1", num_episodes=10):  # 增�
         return (state - state_mean) / state_std
     
     agent = PPOAgent(env, device)
-    agent.load_model(model_path)
+    model_info =agent.load_model(model_path)
     
     rewards = []  # 存储每次评估的奖励
     
@@ -71,6 +71,8 @@ def evaluate_model(model_path,game_name="CartPole-v1", num_episodes=10):  # 增�
     result_filename = os.path.join('evaluate_result', f"{game_name}_{model_name}_{timestamp}.txt")
     with open(result_filename, 'w') as f:
         f.write(f"模型路径: {model_path}\n")
+        f.write(f"策略网络类型: { model_info['network_type']}\n")
+        f.write(f"模型名称: {model_name}\n")
         f.write(f"评估统计:\n")
         f.write(f"平均奖励: {average_reward:.2f}\n")
         f.write(f"标准差: {std_dev:.2f}\n") 
@@ -151,7 +153,7 @@ if __name__ == "__main__":
         print(f"错误：模型文件 {model_path} 不存在，请先训练模型")
         exit()
 
-    print(f"游戏名称: {args.game_name}，评估次数: {args.num_episodes}，模型路径: {args.model_path}")
+    print(f"游戏名称: {args.game_name}，评估次数: {args.num_episodes}，模型路径: {model_path}")
 
     evaluate_model(model_path, game_name=args.game_name, num_episodes=args.num_episodes)  # 传入评估次数参数
 

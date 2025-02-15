@@ -74,4 +74,4 @@ class PolicyNetworkWithTransformer(nn.Module):
             action_probs = action_probs.squeeze(0)
             state_value = state_value.squeeze(0)
         
-        return action_probs, state_value.squeeze(-1)
+        return action_probs, state_value
