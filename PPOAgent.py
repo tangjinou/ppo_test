@@ -5,15 +5,17 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 from PolicyNetwork import PolicyNetwork
+from PolicyNetworkFactory import PolicyNetworkFactory
 
 class PPOAgent:
-    def __init__(self, env, device, early_stop=False, lr=3e-4, gamma=0.99, k_epochs=4, eps_clip=0.2):
+    def __init__(self, env, device, network_type="simple", early_stop=False, lr=3e-4, gamma=0.99, k_epochs=4, eps_clip=0.2):
         """
         初始化 PPO 智能体
         
         参数:
             env: OpenAI Gym 环境
             device: 计算设备（CPU/GPU）
+            network_type: 策略网络类型 ('simple', 'medium', 'large')
             lr: 学习率
             gamma: 折扣因子
             k_epochs: PPO更新轮数
@@ -24,7 +26,13 @@ class PPOAgent:
         self.state_dim = env.observation_space.shape[0]
         self.action_dim = env.action_space.n
 
-        self.policy = PolicyNetwork(self.state_dim, self.action_dim).to(self.device)
+        # 使用工厂类创建策略网络
+        self.policy = PolicyNetworkFactory.create_policy(
+            network_type, 
+            self.state_dim, 
+            self.action_dim
+        ).to(self.device)
+        
         self.optimizer = optim.Adam(self.policy.parameters(), lr=lr)
         self.gamma = gamma
         self.k_epochs = k_epochs
