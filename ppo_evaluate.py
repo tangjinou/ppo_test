@@ -10,6 +10,8 @@ import numpy as np  # 在文件开头添加这行
 
 
 def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估次数
+    model_name = os.path.basename(model_path)
+    model_name = model_name.split('.')[0]
     env = gym.make('CartPole-v1')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
@@ -66,7 +68,7 @@ def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估�
     os.makedirs('evaluate_result', exist_ok=True)
     # 生成带时间戳的评估结果文件名，并保存在evaluate_result文件夹下 
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    result_filename = os.path.join('evaluate_result', f"evaluate_result_{timestamp}.txt")
+    result_filename = os.path.join('evaluate_result', f"{model_name}_{timestamp}.txt")
     with open(result_filename, 'w') as f:
         f.write(f"模型路径: {model_path}\n")
         f.write(f"评估统计:\n")
@@ -76,7 +78,41 @@ def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估�
         f.write(f"最低奖励: {min(rewards)}\n")
         f.write(f"评估次数: {num_episodes}\n")
         f.write(f"评估时间: {timestamp}\n")
+    
+    if average_reward > 490 and std_dev == 0:
+        print(f"模型 {model_name} 性能优秀")
+        play_game(model_path)
+    else:
+        print(f"模型 {model_name} 性能较差")
 
+
+
+def play_game(model_path):
+    """展示模型玩游戏的过程"""
+    env = gym.make('CartPole-v1', render_mode='human')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    agent = PPOAgent(env, device)
+    agent.load_model(model_path)
+    
+    state, _ = env.reset()
+    done = False
+    total_reward = 0
+    
+    while not done:
+        action = agent.select_action_deterministic(state)
+        step_result = env.step(action)
+        
+        if len(step_result) == 5:
+            state, reward, terminated, truncated, _ = step_result
+            done = terminated or truncated
+        else:
+            state, reward, done, _ = step_result
+            
+        total_reward += reward
+        print(f"state: {state} reward: {reward} done: {done}")
+    env.close()
+    print(f"游戏结束，总奖励: {total_reward}")
 
 
 if __name__ == "__main__":
