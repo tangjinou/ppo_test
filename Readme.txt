@@ -7,7 +7,10 @@ conda activate ppo_env
 pip install -r requirements.txt
 
 2. 运行训练：
-python ppo_test.py --ui  #使用界面模式训练，默认为无界面模式
+python ppo_train.py --ui  #使用界面模式训练，默认为无界面模式
+
+3. 运行评估：
+python ppo_evaluate.py --model_path  #评估模型路径，默认为None
 
 
 其他相关：
