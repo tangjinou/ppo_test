@@ -5,6 +5,7 @@ from gym.wrappers import RecordVideo
 import argparse
 import datetime
 import os  # 添加os导入
+import numpy as np  # 在文件开头添加这行
 
 
 
@@ -39,13 +40,32 @@ def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估�
         rewards.append(episode_reward)
         print(f"第 {episode + 1} 次评估完成，奖励: {episode_reward}")
     
-    average_reward = sum(rewards) / len(rewards)
+    rewards = np.array(rewards)  # 将rewards转换为numpy数组
+    average_reward = np.mean(rewards)
+    std_dev = np.std(rewards)
+    
     print(f"\n评估统计:")
     print(f"平均奖励: {average_reward:.2f}")
+    print(f"标准差: {std_dev:.2f}")
     print(f"最高奖励: {max(rewards)}")
     print(f"最低奖励: {min(rewards)}")
     
     env.close()
+
+    # 确保evaluate_result文件夹存在
+    os.makedirs('evaluate_result', exist_ok=True)
+    # 生成带时间戳的评估结果文件名，并保存在evaluate_result文件夹下 
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    result_filename = os.path.join('evaluate_result', f"evaluate_result_{timestamp}.txt")
+    with open(result_filename, 'w') as f:
+        f.write(f"模型路径: {model_path}\n")
+        f.write(f"评估统计:\n")
+        f.write(f"平均奖励: {average_reward:.2f}\n")
+        f.write(f"标准差: {std_dev:.2f}\n") 
+        f.write(f"最高奖励: {max(rewards)}\n")
+        f.write(f"最低奖励: {min(rewards)}\n")
+        f.write(f"评估次数: {num_episodes}\n")
+        f.write(f"评估时间: {timestamp}\n")
 
 
 
@@ -55,8 +75,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--model_path', type=str, default=None,
                        help='评估模型路径，默认为None')
-    parser.add_argument('--num_episodes', type=int, default=1000,
-                       help='评估次数，默认为1000次')  # 添加新的参数
+    parser.add_argument('--num_episodes', type=int, default=500,
+                       help='评估次数，默认为500次')  # 添加新的参数
 
     args = parser.parse_args()
 
