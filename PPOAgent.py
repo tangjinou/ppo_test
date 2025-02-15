@@ -53,6 +53,14 @@ class PPOAgent:
         
         return action.item()
 
+    def select_action_deterministic(self, state):
+        """确定性地选择动作"""
+        with torch.no_grad():
+            state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+            probs, state_value = self.policy(state)  # 解包返回值，只使用概率
+            action = torch.argmax(probs).item()
+        return action
+
     def update(self):
         """更新策略网络"""
         states = torch.stack(self.states).to(self.device)

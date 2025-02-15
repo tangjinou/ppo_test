@@ -14,6 +14,13 @@ def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估�
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
     
+    # 添加状态标准化
+    state_mean = np.zeros(env.observation_space.shape[0])
+    state_std = np.ones(env.observation_space.shape[0])
+    
+    def normalize_state(state):
+        return (state - state_mean) / state_std
+    
     agent = PPOAgent(env, device)
     agent.load_model(model_path)
     
@@ -26,7 +33,10 @@ def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估�
         
         while not done:
             env.render()
-            action = agent.select_action(state)
+
+            normalized_state = normalize_state(state)  # 标准化状态
+            action = agent.select_action_deterministic(normalized_state)  # 使用确定性策略
+            
             step_result = env.step(action)
             
             if len(step_result) == 5:
