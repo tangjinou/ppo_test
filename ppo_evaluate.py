@@ -9,10 +9,10 @@ import numpy as np  # 在文件开头添加这行
 
 
 
-def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估次数
+def evaluate_model(model_path,game_name="CartPole-v1", num_episodes=10):  # 增加参数来控制评估次数
     model_name = os.path.basename(model_path)
     model_name = model_name.split('.')[0]
-    env = gym.make('CartPole-v1')
+    env = gym.make(game_name)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
     
@@ -68,7 +68,7 @@ def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估�
     os.makedirs('evaluate_result', exist_ok=True)
     # 生成带时间戳的评估结果文件名，并保存在evaluate_result文件夹下 
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    result_filename = os.path.join('evaluate_result', f"{model_name}_{timestamp}.txt")
+    result_filename = os.path.join('evaluate_result', f"{game_name}_{model_name}_{timestamp}.txt")
     with open(result_filename, 'w') as f:
         f.write(f"模型路径: {model_path}\n")
         f.write(f"评估统计:\n")
@@ -81,15 +81,15 @@ def evaluate_model(model_path, num_episodes=10):  # 增加参数来控制评估�
     
     if average_reward > 490 and std_dev == 0:
         print(f"模型 {model_name} 性能优秀")
-        play_game(model_path)
+        play_game(game_name,model_path)
     else:
         print(f"模型 {model_name} 性能较差")
 
 
 
-def play_game(model_path):
+def play_game(game_name,model_path):
     """展示模型玩游戏的过程"""
-    env = gym.make('CartPole-v1', render_mode='human')
+    env = gym.make(game_name, render_mode='human')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     agent = PPOAgent(env, device)
@@ -123,7 +123,9 @@ if __name__ == "__main__":
                        help='评估模型路径，默认为None')
     parser.add_argument('--num_episodes', type=int, default=500,
                        help='评估次数，默认为500次')  # 添加新的参数
-
+    parser.add_argument('--game_name', type=str, default="CartPole-v1",
+                       help='游戏名称，默认为CartPole-v1')
+    
     args = parser.parse_args()
 
     model_path = args.model_path
@@ -148,5 +150,7 @@ if __name__ == "__main__":
         print(f"错误：模型文件 {model_path} 不存在，请先训练模型")
         exit()
 
-    evaluate_model(model_path, args.num_episodes)  # 传入评估次数参数
+    print(f"游戏名称: {args.game_name}，评估次数: {args.num_episodes}，模型路径: {args.model_path}")
+    
+    evaluate_model(model_path, game_name=args.game_name, num_episodes=args.num_episodes)  # 传入评估次数参数
 

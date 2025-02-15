@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from PolicyNetwork import PolicyNetwork
 
 class PPOAgent:
-    def __init__(self, env, device, lr=3e-4, gamma=0.99, k_epochs=4, eps_clip=0.2):
+    def __init__(self, env, device, early_stop=False, lr=3e-4, gamma=0.99, k_epochs=4, eps_clip=0.2):
         """
         初始化 PPO 智能体
         
@@ -38,6 +38,13 @@ class PPOAgent:
         self.rewards = []
         self.dones = []
         self.episode_rewards = []
+
+        # 添加 early stopping 相关参数
+        self.early_stop = early_stop
+        self.early_stop_patience = 100  # 容忍多少次没有改善
+        self.early_stop_window = 20    # 计算平均奖励的窗口大小
+        self.best_avg_reward = float('-inf')
+        self.no_improve_count = 0
 
     def select_action(self, state):
         """选择动作"""
@@ -159,8 +166,14 @@ class PPOAgent:
             self.update()
             self.episode_rewards.append(total_reward)
             
+            # Early stopping 检查
+            if self.early_stop == "true" and episode >= self.early_stop_window:
+                recent_rewards = self.episode_rewards[-self.early_stop_window:]
+            # early_stop 的代码待实现 还没有想清楚
+            
             if (episode + 1) % 10 == 0:
-                print(f"回合 {episode + 1}\t总奖励: {total_reward}")
+                avg_reward = np.mean(self.episode_rewards[-self.early_stop_window:]) if episode >= self.early_stop_window else np.mean(self.episode_rewards)
+                print(f"回合 {episode + 1}\t总奖励: {total_reward:.2f}\t最近{self.early_stop_window}回合平均奖励: {avg_reward:.2f}")
 
     def evaluate(self, state):
         """评估状态"""
