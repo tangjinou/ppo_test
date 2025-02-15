@@ -8,9 +8,17 @@ pip install -r requirements.txt
 
 2. 运行训练：
 python ppo_train.py --ui  #使用界面模式训练，默认为无界面模式
+                    --early_stop  #使用早停策略训练，默认为不使用早停策略（目前没有实现）
+                    --game_name  #游戏名称，默认为CartPole-v1
+                    --num_episodes  #训练回合数，默认为3000
+
 
 3. 运行评估：
-python ppo_evaluate.py --model_path  
+python ppo_evaluate.py --model_path  #评估模型路径，默认为运行时checkpoints目录下最新的模型文件
+                    --num_episodes  #评估回合数，默认为500
+                    --game_name  #游戏名称，默认为CartPole-v1
+
+
 #评估模型路径，默认为运行时checkpoints目录下最新的模型文件
 #如果为空，则先运行训练python ppo_train.py，再运行评估
 
@@ -51,3 +59,4 @@ python ppo_evaluate.py --model_path
 - **info**: 附加信息（通常为空）
 
 注意：CartPole-v0 的 reward的值 最大的值为500，当然最小才是0
+通常训练大过3500回合，基本效果就会达到最优
