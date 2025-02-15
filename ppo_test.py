@@ -4,29 +4,10 @@ from PPOAgent import PPOAgent
 from gym.wrappers import RecordVideo
 import argparse
 import datetime  # 在文件开头添加此导入
-import numpy as np
 
-class NormalizedEnv(gym.Wrapper):
-    def __init__(self, env):
-        super(NormalizedEnv, self).__init__(env)
-        self.reward_mean = 0
-        self.reward_std = 1
-        self.reward_history = []
-        
-    def step(self, action):
-        obs, reward, done, info = self.env.step(action)
-        self.reward_history.append(reward)
-        
-        # 计算滑动平均和标准差
-        if len(self.reward_history) > 100:
-            self.reward_mean = np.mean(self.reward_history[-100:])
-            self.reward_std = np.std(self.reward_history[-100:]) + 1e-8
-            
-        normalized_reward = (reward - self.reward_mean) / self.reward_std
-        return obs, normalized_reward, done, info
 
 def train_with_no_ui(num_episodes=3000):
-    env = NormalizedEnv(gym.make('CartPole-v1'))
+    env = gym.make('CartPole-v1')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
     agent = PPOAgent(env, device)
