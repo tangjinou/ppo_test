@@ -21,7 +21,7 @@ class PolicyNetworkFactory:
 
         print(f"创建策略网络: {network_type}") 
         if network_type == "simple":
-            return PolicyNetworkWithTransformer(state_dim, action_dim)
+            return PolicyNetwork(state_dim, action_dim)
         elif network_type == "medium":
             return PolicyNetwork(state_dim, action_dim, hidden_dim=256)
         elif network_type == "large":
