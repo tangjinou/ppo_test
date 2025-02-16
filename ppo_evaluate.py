@@ -6,6 +6,8 @@ import argparse
 import datetime
 import os  # 添加os导入
 import numpy as np  # 在文件开头添加这行
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 
@@ -80,13 +82,27 @@ def evaluate_model(model_path,game_name="CartPole-v1", num_episodes=10):  # 增�
         f.write(f"最低奖励: {min(rewards)}\n")
         f.write(f"评估次数: {num_episodes}\n")
         f.write(f"评估时间: {timestamp}\n")
+
+   
+
+    # 生成奖励曲线图
+    plt.figure(figsize=(10, 5))
+    plt.plot(rewards, label='Reward')
+    plt.xlabel('Episode')
+    plt.ylabel('Reward')
+    plt.title('Reward Curve')
+    plt.legend()
+    plt.savefig(os.path.join('evaluate_result', f"{game_name}_{model_name}_{timestamp}_reward_curve.png"))
+    plt.close() 
+   
+
     
-    if average_reward > 490 and std_dev == 0:
-        print(f"模型 {model_name} 性能优秀")
-        play_game(game_name,model_path)
-    else:
-        print(f"模型 {model_name} 性能较差")
-        play_game(game_name,model_path)
+    # if average_reward > 490 and std_dev == 0:
+    #     print(f"模型 {model_name} 性能优秀")
+    #     play_game(game_name,model_path)
+    # else:
+    #     print(f"模型 {model_name} 性能较差")
+    #     play_game(game_name,model_path)
 
 
 
