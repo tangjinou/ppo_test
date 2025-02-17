@@ -10,7 +10,7 @@ pip install -r requirements.txt
 python ppo_train.py --ui  #使用界面模式训练，默认为无界面模式
                     --early_stop  #使用早停策略训练，默认为不使用早停策略（目前没有实现）
                     --game_name  #游戏名称，默认为CartPole-v1
-                    --num_episodes  #训练回合数，默认为3000
+                    --num_episodes  #训练回合数，默认为5000
 
 
 3. 运行评估：

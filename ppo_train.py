@@ -7,7 +7,7 @@ import datetime
 import os  # 添加os导入
 
 
-def train_with_no_ui(num_episodes=3000, network_type="simple", early_stop=False, game_name="CartPole-v1"):
+def train_with_no_ui(num_episodes=5000, network_type="simple", early_stop=False, game_name="CartPole-v1"):
     env = gym.make('CartPole-v1')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
@@ -23,7 +23,7 @@ def train_with_no_ui(num_episodes=3000, network_type="simple", early_stop=False,
     env.close()
     agent.plot_rewards()
 
-def train_with_ui(num_episodes=3000, network_type="simple", early_stop=False, game_name="CartPole-v1"):
+def train_with_ui(num_episodes=5000, network_type="simple", early_stop=False, game_name="CartPole-v1"):
     # 创建环境并启用视频录制
     env = gym.make('CartPole-v1', render_mode="human")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -68,8 +68,8 @@ if __name__ == "__main__":
     parser.add_argument('--ui', action='store_true', 
                        help='使用界面模式训练，默认为无界面模式',
                        default=False)
-    parser.add_argument('--num_episodes', type=int, default=3000,
-                       help='训练轮数，默认为10000')
+    parser.add_argument('--num_episodes', type=int, default=5000,
+                       help='训练轮数，默认为5000')
     parser.add_argument('--game_name', type=str, default="CartPole-v1",
                        help='游戏名称，默认为CartPole-v1')
     parser.add_argument('--network_type', type=str, default="simple",
