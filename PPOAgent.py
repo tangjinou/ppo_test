@@ -209,6 +209,7 @@ class PPOAgent:
         """加载模型和网络配置"""
         print(f"加载模型: {path}")
         model_info = torch.load(path)
+        print(model_info)
         # 使用保存的配置重新创建策略网络
         self.policy = PolicyNetworkFactory.create_policy(
             model_info['network_type'],

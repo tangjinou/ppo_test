@@ -97,12 +97,12 @@ def evaluate_model(model_path,game_name="CartPole-v1", num_episodes=10):  # 增�
    
 
     
-    # if average_reward > 490 and std_dev == 0:
-    #     print(f"模型 {model_name} 性能优秀")
-    #     play_game(game_name,model_path)
-    # else:
-    #     print(f"模型 {model_name} 性能较差")
-    #     play_game(game_name,model_path)
+    if average_reward > 490 and std_dev == 0:
+        print(f"模型 {model_name} 性能优秀")
+        play_game(game_name,model_path)
+    else:
+        print(f"模型 {model_name} 性能较差")
+        play_game(game_name,model_path)
 
 
 

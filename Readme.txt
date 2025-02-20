@@ -62,3 +62,10 @@ python ppo_evaluate.py --model_path  #评估模型路径，默认为运行时che
 
 注意：CartPole-v0 的 reward的值 最大的值为500，当然最小才是0
 通常训练大过3500回合，基本效果就会达到最优
+
+本地训练的比较好的模型地址
+CartPole-v1_ppo_model_20250216_053209.pth
+
+python ppo_evaluate.py --model_path=checkpoints/CartPole-v1_ppo_model_20250216_053209.pth 
+
+
